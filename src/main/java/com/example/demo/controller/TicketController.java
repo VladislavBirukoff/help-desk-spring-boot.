@@ -1,21 +1,57 @@
 package com.example.demo.controller;
 
-import com.example.demo.repository.TicketRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.dto.TicketCreateDto;
+import com.example.demo.model.Ticket;
+import com.example.demo.service.TicketService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequestMapping("/tickets")
 public class TicketController {
 
-    @Autowired // Просим Spring дать нам репозиторий
-    private TicketRepository ticketRepository;
+    private final TicketService ticketService;
 
-    @GetMapping("/tickets")
-    public String listTickets(Model model) {
-        // Берем из базы список, кладем в модель под именем "tickets"
-        model.addAttribute("tickets", ticketRepository.findAllByOrderByCreatedAtDesc());
-        return "tickets"; // Покажем страницу tickets.html
+    public TicketController(TicketService ticketService) {
+        this.ticketService = ticketService;
+    }
+
+    // Список всех заявок (было в модуле 3)
+    @GetMapping
+    public String showTickets(Model model) {
+        model.addAttribute("tickets", ticketService.getAllTickets());
+        return "tickets";
+    }
+
+    // Показать форму создания заявки
+    @GetMapping("/new")
+    public String showCreateForm(Model model) {
+        model.addAttribute("ticket", new TicketCreateDto());
+        return "ticket-form";
+    }
+
+    // Обработка отправки формы
+    @PostMapping
+    public String createTicket(
+            @Valid @ModelAttribute("ticket") TicketCreateDto ticketDto,
+            BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return "ticket-form";
+        }
+
+        Ticket savedTicket = ticketService.createTicket(ticketDto);
+        return "redirect:/tickets/" + savedTicket.getId() + "/success";
+    }
+
+    // Страница благодарности после создания
+    @GetMapping("/{id}/success")
+    public String showSuccessPage(@PathVariable Long id, Model model) {
+        Ticket ticket = ticketService.getTicketById(id);
+        model.addAttribute("ticket", ticket);
+        return "ticket-success";
     }
 }

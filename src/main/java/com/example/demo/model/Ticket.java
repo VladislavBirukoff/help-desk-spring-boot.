@@ -37,4 +37,13 @@ public class Ticket {
     private TicketStatus status;
     public TicketStatus getStatus() { return status; }
     public void setStatus(TicketStatus status) { this.status = status; }
+    @PrePersist
+    public void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (status == null) {
+            status = TicketStatus.NEW;
+        }
+    }
 }
