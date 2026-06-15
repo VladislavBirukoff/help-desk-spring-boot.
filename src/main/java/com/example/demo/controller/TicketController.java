@@ -19,13 +19,6 @@ public class TicketController {
         this.ticketService = ticketService;
     }
 
-    // Список всех заявок (было в модуле 3)
-    @GetMapping
-    public String showTickets(Model model) {
-        model.addAttribute("tickets", ticketService.getAllTickets());
-        return "tickets";
-    }
-
     // Показать форму создания заявки
     @GetMapping("/new")
     public String showCreateForm(Model model) {

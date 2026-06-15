@@ -17,7 +17,7 @@ public class TicketCreateDto {
     @Size(max = 2000, message = "Описание не должно превышать 2000 символов")
     private String description;
 
-    // Конструктор по умолчанию (нужен для Spring)
+    // Конструктор по умолчанию
     public TicketCreateDto() {}
 
     // Геттеры и сеттеры
